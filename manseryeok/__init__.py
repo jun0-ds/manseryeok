@@ -1,14 +1,8 @@
-"""manseryeok — Korean saju/manseryeok library.
-
-Public API (will expand as core/ module is implemented):
-    - Pillar, Saju, TodayPillars (types)
-    - Stem, Branch, Wuxing, WuxingRelation, YinYang (types)
-    - calculate_saju(birth, ...) — coming with core.pillars
-    - today_pillars(now, ...) — coming with core.pillars
-"""
+"""manseryeok — Korean saju/manseryeok library."""
 
 from __future__ import annotations
 
+from manseryeok.core.pillars import calculate_saju, today_pillars
 from manseryeok.types import (
     Branch,
     Pillar,
@@ -20,10 +14,12 @@ from manseryeok.types import (
     YinYang,
 )
 
-__version__ = "0.0.1.dev0"
+__version__ = "0.1.0"
 
 __all__ = [
     "__version__",
+    "calculate_saju",
+    "today_pillars",
     "Branch",
     "Pillar",
     "Saju",
