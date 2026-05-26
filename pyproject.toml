@@ -1,6 +1,6 @@
 [project]
 name = "manseryeok"
-version = "0.2.0"
+version = "0.3.0"
 description = "한국식 만세력·사주 Python 라이브러리. 외부 의존성 0, 1900-2100 절기 데이터, 진태양시·조자시 표준."
 requires-python = ">=3.12"
 license = { text = "MIT" }
