@@ -86,7 +86,7 @@ wheels = [
 
 [[package]]
 name = "manseryeok"
-version = "0.0.1.dev0"
+version = "0.2.0"
 source = { editable = "." }
 
 [package.dev-dependencies]
