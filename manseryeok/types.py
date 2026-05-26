@@ -103,3 +103,33 @@ class TodayPillars:
     year: Pillar
     month: Pillar
     day: Pillar
+
+
+@dataclass(frozen=True, slots=True)
+class DaeunPeriod:
+    """한 대운 — 시작 나이부터 10년간."""
+
+    start_age: int  # 이 대운이 시작하는 만 나이
+    pillar: Pillar  # 대운 간지
+
+
+@dataclass(frozen=True, slots=True)
+class Daeun:
+    """대운(大運) — 평생 고정 시퀀스. 사주 계산 시 1회 산출·저장·반복 사용.
+
+    '지금 몇 대운인가'만 현재 나이로 인덱싱한다(at_age).
+    """
+
+    start_age: int  # 대운수 (첫 대운 시작 만 나이)
+    forward: bool  # 순행(True) / 역행(False)
+    periods: tuple[DaeunPeriod, ...]
+
+    def at_age(self, age: int) -> DaeunPeriod | None:
+        """주어진 만 나이에 해당하는 대운. 첫 대운 시작 전이면 None."""
+        chosen: DaeunPeriod | None = None
+        for p in self.periods:
+            if p.start_age <= age:
+                chosen = p
+            else:
+                break
+        return chosen
