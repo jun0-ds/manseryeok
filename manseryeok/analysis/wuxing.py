@@ -1,4 +1,4 @@
-"""오행 (Five elements) relations.
+"""오행 (Five elements) relations + 지장간 가중 분포.
 
 Generating cycle (상생): 木 → 火 → 土 → 金 → 水 → 木
 Controlling cycle (상극): 木 × 土 × 水 × 火 × 金 × 木
@@ -13,7 +13,9 @@ Relation from a's perspective toward b:
 
 from __future__ import annotations
 
-from manseryeok.types import Wuxing, WuxingRelation
+from manseryeok.data.hidden_stems import HIDDEN_STEMS
+from manseryeok.data.stems import stem_by_char
+from manseryeok.types import Saju, Wuxing, WuxingRelation
 
 # generating[x] = the element that x generates
 _GENERATING: dict[Wuxing, Wuxing] = {
@@ -56,3 +58,34 @@ def wuxing_relation(a: Wuxing, b: Wuxing) -> WuxingRelation:
         return WuxingRelation.CONTROLLED_BY
     # Unreachable for valid Wuxing inputs
     raise AssertionError(f"unreachable: {a!r} vs {b!r}")
+
+
+def branch_hidden_wuxing(branch_char: str) -> dict[Wuxing, float]:
+    """지지 지장간의 오행 비중 (합 1.0).
+
+    단순 가중(본기 0.6 / 중기 0.3 / 여기 0.1, 왕지는 0.7/0.3). 같은 오행 지장간은 합산.
+    예: branch_hidden_wuxing("寅") → {목: 0.6, 화: 0.3, 토: 0.1}
+    """
+    out: dict[Wuxing, float] = {}
+    for stem_char, weight in HIDDEN_STEMS[branch_char]:
+        wx = stem_by_char(stem_char).wuxing
+        out[wx] = out.get(wx, 0.0) + weight
+    return out
+
+
+def wuxing_distribution(saju: Saju, *, hidden: bool = True) -> dict[Wuxing, float]:
+    """8글자 오행 분포 (합 8.0).
+
+    천간 4글자는 각 1.0(단일 오행). 지지 4글자는:
+    - hidden=True  → 지장간 비중으로 분산 (예 寅 = 목 0.6 / 화 0.3 / 토 0.1)
+    - hidden=False → 본기 오행에 1.0 (지장간 무시, 기존 단순 방식)
+    """
+    dist: dict[Wuxing, float] = dict.fromkeys(Wuxing, 0.0)
+    for p in (saju.year, saju.month, saju.day, saju.hour):
+        dist[p.stem.wuxing] += 1.0
+        if hidden:
+            for wx, w in branch_hidden_wuxing(p.branch.char).items():
+                dist[wx] += w
+        else:
+            dist[p.branch.wuxing] += 1.0
+    return dist
